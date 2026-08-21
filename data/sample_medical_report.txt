@@ -1,0 +1,27 @@
+PATIENT HEALTH EVALUATION REPORT
+=================================
+Patient Name: Johnathan Miller
+Age: 58 years
+Gender: Male
+Clinical Indications: Patient presents with chest pain during exercise, characterized as Atypical Angina.
+
+CLINICAL MEASUREMENTS:
+----------------------
+- Resting Blood Pressure: 145 mm Hg (Stage 2 Hypertension)
+- Serum Cholesterol: 265 mg/dL (High risk hypercholesterolemia)
+- Fasting Blood Sugar: 105 mg/dL (Normal, Fasting Blood Sugar > 120 mg/dL: No)
+- Resting ECG: Shows signs of Left Ventricular Hypertrophy (LVH)
+- Maximum Heart Rate Achieved: 135 bpm during treadmill stress test
+- Exercise Induced Angina: Patient reported mild chest tightness during stress test (Yes)
+- ST Depression: 2.1 mm ST depression recorded during peak exercise (oldpeak = 2.1)
+- Slope of ST segment: Flat ST segment during peak exercise (slope = Flat)
+- Fluoroscopy: 1 major vessel colored by fluoroscopy (ca = 1)
+- Thalassemia Type: Reversible defect detected (thal = Reversible Defect)
+
+CLINICAL RECOMMENDATIONS:
+-------------------------
+1. Refer to cardiology department for cardiac stress test and diagnostic angiography.
+2. Initiate antihypertensive therapy and statins for hypercholesterolemia.
+3. Patient must restrict intense physical activities and strenuous exercise.
+4. Adopt low-sodium, heart-healthy Mediterranean diet. Reduce intake of saturated fats.
+5. Absolute cessation of smoking and alcohol consumption.
