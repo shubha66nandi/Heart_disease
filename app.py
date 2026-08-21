@@ -564,17 +564,21 @@ tab_options = [
 
 if st.session_state.active_tab not in tab_options:
     st.session_state.active_tab = tab_options[0]
-active_index = tab_options.index(st.session_state.active_tab)
+
+def sync_sidebar_nav():
+    st.session_state.active_tab = st.session_state.nav_sidebar
 
 st.sidebar.markdown("<div style='font-size:0.72rem;font-weight:700;color:#3B8BD4;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;'>Navigation</div>", unsafe_allow_html=True)
-page = st.sidebar.radio(
-    "",
+st.sidebar.radio(
+    "Navigation",
     tab_options,
-    index=active_index,
-    key="nav_sidebar"
+    index=tab_options.index(st.session_state.active_tab),
+    key="nav_sidebar",
+    on_change=sync_sidebar_nav,
+    label_visibility="collapsed"
 )
 
-st.session_state.active_tab = page
+page = st.session_state.active_tab
 
 # Gemini API Key — styled section
 st.sidebar.markdown("""
@@ -739,6 +743,29 @@ model = pipeline_data["model"]
 processor = pipeline_data["processor"]
 metrics = pipeline_data["metrics"]
 meta = pipeline_data["metadata"]
+
+# ----------------- Top Navigation Bar (Mobile & Desktop Friendly) -----------------
+st.markdown("""
+<div style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(59, 139, 212, 0.3); border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; backdrop-filter: blur(8px);">
+  <div style="font-size: 0.75rem; font-weight: 700; color: #60a5fa; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 6px;">
+    <span>🧭</span> SELECT FEATURE PORTAL / MODULE:
+  </div>
+</div>
+""", unsafe_allow_html=True)
+
+def sync_top_nav():
+    st.session_state.active_tab = st.session_state.top_nav_selector
+
+st.selectbox(
+    "Select Feature Portal",
+    tab_options,
+    index=tab_options.index(st.session_state.active_tab),
+    key="top_nav_selector",
+    on_change=sync_top_nav,
+    label_visibility="collapsed"
+)
+
+page = st.session_state.active_tab
 
 # Page 1: Diagnostic Predictor
 if page == "🏥 Diagnostic Predictor":
