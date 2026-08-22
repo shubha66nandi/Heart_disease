@@ -1,47 +1,44 @@
 # CardioSense AI 🏥
 
-### *A Production-Grade Clinical Decision Support System for Heart Disease Risk Prediction*
+### *A Production-Grade Clinical Decision Support System for 10-Year Heart Disease Risk Prediction*
+*(Final Year Capstone & Portfolio-Grade Data Science Project)*
 
-CardioSense AI is an end-to-end Machine Learning web application designed to support cardiologists and medical professionals in evaluating heart disease risk. Built using **Streamlit**, **Scikit-Learn**, and **Plotly**, and designed to integrate with **Supabase** (with a seamless local **SQLite** fallback), the application leverages a **Stacking Classifier Ensemble** to deliver high-accuracy diagnostic suggestions alongside Explainable AI insights.
+CardioSense AI is a state-of-the-art Machine Learning web application engineered to support cardiologists and medical researchers in evaluating 10-year risk of **Coronary Heart Disease (CHD)**. Powered by the **Framingham Heart Study dataset (4,238 patient cohort records)**, **Streamlit**, **Scikit-Learn**, **XGBoost**, **LightGBM**, and **Plotly**, the application integrates a **Stacking Classifier Ensemble**, **AI Clinical Consultation Engine**, **Heart Age Estimator**, **Batch CSV Patient Screening**, and **Explainable AI (SHAP)**.
 
 ---
 
-## 🌟 Key Features
+## 🌟 Key Capstone Features
 
-1. **🏥 Patient Diagnostic Predictor**:
-   - High-fidelity clinical input forms with range validation and description tooltips.
-   - Real-time diagnostic risk assessment using a Stacking Ensemble.
-   - Interactive gauge charts visualising risk probability.
-   - Dynamic clinical observation summaries and guidelines.
-2. **🔬 Explainable AI (XAI)**:
-   - Live feature impact charts (SHAP / deviation contribution) explaining the *why* behind every patient's prediction.
-   - Prevents the "black box" machine learning issue, building clinical confidence.
-3. **📊 Clinical Data Explorer (EDA)**:
-   - Interactive, zoomable Plotly charts analyzing the Cleveland Heart Disease dataset.
-   - Features: Age vs. Max Heart Rate scatter analysis, cholesterol distributions, chest pain type analyses, and feature correlation heatmaps.
-4. **🔬 Ensemble Analytics Dashboard**:
-   - Full model comparison metrics showing why Stacking was chosen.
-   - Stacking architecture breakdown, Confusion Matrix, and global feature importance charts.
-5. **📋 Patient Records Database**:
-   - Structured history log saving patient inputs, risk probability, and diagnosis.
-   - Search by name/ID, filter by risk level, export logs to CSV, and delete entries.
-   - **Database Hybrid Architecture**: Uses **Supabase** in production and automatically falls back to a zero-configuration local **SQLite** database (`patient_history.db`) if keys are absent.
+1. **🏥 Diagnostic Risk Predictor & AI Clinical Consultation**:
+   - Comprehensive intake form covering Patient Demographics, Lifestyle Behaviors, Medical Conditions, Vitals, and Blood Glucose.
+   - Real-time 10-year CHD risk probability gauge and diagnostic risk classification (Low vs. High Risk).
+   - **❤️ Heart Age Estimator**: Calculates estimated cardiovascular Heart Age vs. actual chronological age ($+X$ years older/younger).
+   - **🤖 AI Medical Evaluation Report Generator**: Generates structured clinical evaluation reports with individualized prescriptions (supports OpenAI/LLM API key integration + built-in Clinical Knowledge Engine fallback). One-click `.txt` report download.
+2. **📁 Batch Patient CSV Screening**:
+   - Drag-and-drop CSV file uploader for bulk patient screening.
+   - Automated batch prediction, high-risk ratio KPI tiles, probability distribution charts, and exportable bulk prediction CSV.
+3. **🔬 Explainable AI (XAI)**:
+   - Live feature contribution charts powered by **SHAP (SHapley Additive exPlanations)**.
+   - Transparently highlights which clinical metrics increase or decrease a patient's risk.
+4. **📊 Clinical Data Explorer (EDA)**:
+   - Interactive Plotly analytics across 4 tabs: Blood Pressure & Cholesterol, Smoking & Diabetes Impact, Age & Metabolic Profile, and Correlation Matrix.
+5. **🔬 Base Models vs. Stacking Benchmark Comparator**:
+   - Performance comparison table (**XGBoost**, **Random Forest**, **LightGBM**, **Support Vector Classifier**, **Logistic Regression** vs. **Stacking Ensemble**).
+   - Interactive Model Switcher: Test patient inputs against individual base estimators vs. the Stacking Ensemble.
+6. **📋 Patient Records & Database Manager**:
+   - Search patient records by name/ID and filter by risk level.
+   - Dual-mode architecture: Automatic zero-config local **SQLite** (`patient_history.db`) with automatic schema migration and **Supabase** cloud sync.
 
 ---
 
 ## ⚡ Stacking Ensemble Architecture
 
-The core predictive engine is a **Stacking Classifier** that blends predictions from multiple optimized base estimators to minimize prediction variance and maximize AUC-ROC:
+The core predictive engine is a **Stacking Classifier** that blends probability outputs from diverse base estimators using a Logistic Regression meta-learner:
 
-- **Base Learner 1 (XGBoost / Gradient Boosting)**: Extracts complex non-linear decision boundaries.
-- **Base Learner 2 (Random Forest)**: A robust bagging algorithm that resists overfitting.
-- **Base Learner 3 (LightGBM / Support Vector Machine)**: Integrates diverse margin-maximizing boundaries.
-- **Final Meta-Learner (Logistic Regression)**: Learns how to optimally weight and combine the base estimators' probability outputs.
-
-On the validation test set, this Stacking Ensemble achieves:
-* **Accuracy**: **~90.16%**
-* **AUC-ROC**: **~0.9535**
-* **F1-Score**: **~0.8966**
+- **Base Estimator 1 (XGBoost)**: Gradient boosted decision trees for non-linear feature interactions.
+- **Base Estimator 2 (Random Forest)**: Bagged decision trees for robust variance reduction.
+- **Base Estimator 3 (LightGBM / SVC)**: High-speed gradient boosting or margin-maximizing decision boundaries.
+- **Final Meta-Learner (Logistic Regression)**: Optimal meta-weighted probability assignment.
 
 ---
 
@@ -57,16 +54,21 @@ pip install -r requirements.txt
 If you would like to connect to Supabase:
 1. Rename `.env.template` to `.env`.
 2. Enter your `SUPABASE_URL` and `SUPABASE_KEY` variables.
-3. If no `.env` file is configured, the application will **automatically create and use a local SQLite database (`patient_history.db`)** without crashing.
+3. If no `.env` file is configured, the application automatically creates and uses a local SQLite database (`patient_history.db`).
 
 ### 3. Model Training
-Train the ensemble model pipeline (downloads the Cleveland dataset from UCI and saves the serialized pipeline):
+Train the ensemble model pipeline on the Framingham dataset:
 ```bash
 python src/train.py
 ```
 
+To run optional Optuna hyperparameter tuning during training:
+```bash
+python src/train.py --tune
+```
+
 ### 4. Running the Web Application
-Launch the Streamlit dashboard:
+Launch the Streamlit clinical dashboard:
 ```bash
 streamlit run app.py
 ```
@@ -80,27 +82,19 @@ Streamlit will automatically host the web app locally (typically at `http://loca
 HeartDeseasePrediction model/
 │
 ├── data/
-│   └── heart_cleveland.csv       # Cached UCI Cleveland heart disease dataset
+│   ├── framingham.csv             # Framingham Heart Study dataset (4,238 records, 16 features)
+│   └── sample_medical_report.txt  # Sample medical report template
 ├── models/
-│   └── heart_disease_classifier.joblib  # Serialized model and scaler pipeline
+│   └── heart_disease_classifier.joblib  # Serialized Stacking Ensemble pipeline & scaler
 ├── src/
 │   ├── __init__.py
-│   ├── data_processor.py         # Custom sklearn transformer for preprocessing
-│   ├── train.py                  # Model training and tuning pipeline
-│   ├── database.py               # Supabase + SQLite database manager
-│   └── explainers.py             # SHAP / Contribution explainers
+│   ├── data_processor.py         # Custom sklearn transformer for Framingham preprocessing & feature engineering
+│   ├── train.py                  # Model training, SMOTE balancing, and tuning pipeline
+│   ├── database.py               # Supabase + SQLite database manager (with auto-migration)
+│   └── explainers.py             # SHAP feature explainer, Heart Age calculator & AI Medical Report generator
 │
-├── app.py                        # Streamlit web app frontend
+├── app.py                        # Streamlit web app frontend (5 Executive Modules)
 ├── requirements.txt              # Project dependencies
 ├── .env.template                 # Template config for Supabase
-└── README.md                     # Professional documentation
+└── README.md                     # Documentation
 ```
-
----
-
-## 🩺 Clinical Guidance Features
-The predictor dynamically alerts clinicians if specific metrics exceed standard guidelines:
-- **Hypertension**: Resting Blood Pressure $\ge 140$ mm Hg.
-- **Hypercholesterolemia**: Serum Cholesterol $\ge 240$ mg/dL.
-- **Myocardial Ischemia**: ST Depression induced by exercise $\ge 1.5$ mm.
-- **Angina Indicators**: Exercise-induced angina detected.

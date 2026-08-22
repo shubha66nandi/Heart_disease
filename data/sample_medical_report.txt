@@ -1,27 +1,30 @@
-PATIENT HEALTH EVALUATION REPORT
-=================================
+PATIENT CARDIOVASCULAR HEALTH EVALUATION REPORT
+=================================================
 Patient Name: Johnathan Miller
-Age: 58 years
+Age: 54 years
 Gender: Male
-Clinical Indications: Patient presents with chest pain during exercise, characterized as Atypical Angina.
+Education: College Degree or Higher
 
-CLINICAL MEASUREMENTS:
-----------------------
-- Resting Blood Pressure: 145 mm Hg (Stage 2 Hypertension)
-- Serum Cholesterol: 265 mg/dL (High risk hypercholesterolemia)
-- Fasting Blood Sugar: 105 mg/dL (Normal, Fasting Blood Sugar > 120 mg/dL: No)
-- Resting ECG: Shows signs of Left Ventricular Hypertrophy (LVH)
-- Maximum Heart Rate Achieved: 135 bpm during treadmill stress test
-- Exercise Induced Angina: Patient reported mild chest tightness during stress test (Yes)
-- ST Depression: 2.1 mm ST depression recorded during peak exercise (oldpeak = 2.1)
-- Slope of ST segment: Flat ST segment during peak exercise (slope = Flat)
-- Fluoroscopy: 1 major vessel colored by fluoroscopy (ca = 1)
-- Thalassemia Type: Reversible defect detected (thal = Reversible Defect)
+LIFESTYLE & MEDICAL HISTORY:
+----------------------------
+- Current Smoker: Yes (20 cigarettes per day / 1 pack per day)
+- On Blood Pressure Medication: Yes
+- History of Stroke: No
+- Prevalent Hypertension: Yes (Stage 1/2 Hypertension)
+- Diabetes Mellitus: No
 
-CLINICAL RECOMMENDATIONS:
--------------------------
-1. Refer to cardiology department for cardiac stress test and diagnostic angiography.
-2. Initiate antihypertensive therapy and statins for hypercholesterolemia.
-3. Patient must restrict intense physical activities and strenuous exercise.
-4. Adopt low-sodium, heart-healthy Mediterranean diet. Reduce intake of saturated fats.
-5. Absolute cessation of smoking and alcohol consumption.
+CLINICAL & LAB MEASUREMENTS:
+----------------------------
+- Systolic Blood Pressure: 145.0 mm Hg (Elevated)
+- Diastolic Blood Pressure: 92.0 mm Hg (Elevated)
+- Total Cholesterol: 255.0 mg/dL (High risk hypercholesterolemia)
+- Fasting Blood Glucose: 98.0 mg/dL (Normal)
+- Body Mass Index (BMI): 28.5 kg/m² (Overweight)
+- Resting Heart Rate: 78 bpm (Normal)
+
+ESTIMATED 10-YEAR CHD RISK & RECOMMENDATIONS:
+---------------------------------------------
+1. Refer for comprehensive cardiovascular risk assessment.
+2. Optimize antihypertensive therapy and initiate lipid-lowering statin therapy.
+3. Enrollment in smoking cessation behavioral counseling program.
+4. Adopt low-sodium, heart-healthy Mediterranean diet with regular low-impact aerobic exercise.

@@ -46,88 +46,76 @@ try:
 except ImportError:
     from src.data_processor import HeartDiseaseDataProcessor
 
-UCI_URL = "https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.cleveland.data"
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 MODEL_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "models")
-DATA_PATH = os.path.join(DATA_DIR, "heart_cleveland.csv")
+DATA_PATH = os.path.join(DATA_DIR, "framingham.csv")
 MODEL_PATH = os.path.join(MODEL_DIR, "heart_disease_classifier.joblib")
 
-def download_dataset():
-    """Downloads the Cleveland dataset from UCI repository and caches it locally."""
+def load_dataset():
+    """Loads the Framingham Heart Study dataset from data/framingham.csv."""
     if not os.path.exists(DATA_DIR):
         os.makedirs(DATA_DIR)
         
     if not os.path.exists(DATA_PATH):
-        print(f"Downloading dataset from {UCI_URL}...")
-        try:
-            urllib.request.urlretrieve(UCI_URL, DATA_PATH)
-            print(f"Dataset cached successfully at {DATA_PATH}")
-        except Exception as e:
-            print(f"Error downloading dataset: {e}")
-            print("Attempting to load synthetic backup data for offline testing...")
-            return get_synthetic_data()
+        print(f"Dataset file {DATA_PATH} not found! Generating synthetic Framingham fallback...")
+        return get_synthetic_data()
     else:
-        print(f"Using cached dataset at {DATA_PATH}")
+        print(f"Using dataset at {DATA_PATH}")
         
     try:
-        column_names = [
-            "age", "sex", "cp", "trestbps", "chol", "fbs",
-            "restecg", "thalach", "exang", "oldpeak",
-            "slope", "ca", "thal", "target"
-        ]
-        df = pd.read_csv(DATA_PATH, names=column_names, na_values="?")
-        # Binary target: 0 = no disease, 1 = disease (target > 0 represents disease presence)
-        df["target"] = (df["target"] > 0).astype(int)
+        df = pd.read_csv(DATA_PATH)
+        if "TenYearCHD" in df.columns:
+            df["TenYearCHD"] = pd.to_numeric(df["TenYearCHD"], errors="coerce").fillna(0).astype(int)
         return df
     except Exception as e:
         print(f"Error reading dataset: {e}. Falling back to synthetic data.")
         return get_synthetic_data()
 
 def get_synthetic_data():
-    """Generates synthetic heart disease data if network is unavailable."""
+    """Generates synthetic Framingham heart disease data if network/file is unavailable."""
     np.random.seed(42)
-    n_samples = 300
+    n_samples = 1000
     
-    # Generate realistic ranges matching Cleveland dataset
-    age = np.random.normal(54, 9, n_samples).clip(29, 77).astype(int)
-    sex = np.random.binomial(1, 0.68, n_samples)
-    cp = np.random.choice([1, 2, 3, 4], n_samples, p=[0.1, 0.15, 0.25, 0.5])
-    trestbps = np.random.normal(131, 17, n_samples).clip(94, 200).astype(int)
-    chol = np.random.normal(246, 50, n_samples).clip(126, 564).astype(int)
-    fbs = np.random.binomial(1, 0.15, n_samples)
-    restecg = np.random.choice([0, 1, 2], n_samples, p=[0.5, 0.1, 0.4])
-    thalach = np.random.normal(149, 22, n_samples).clip(71, 202).astype(int)
-    exang = np.random.binomial(1, 0.32, n_samples)
-    oldpeak = np.random.exponential(1.0, n_samples).clip(0.0, 6.2).round(1)
-    slope = np.random.choice([1, 2, 3], n_samples, p=[0.45, 0.45, 0.1])
-    ca = np.random.choice([0.0, 1.0, 2.0, 3.0], n_samples, p=[0.6, 0.2, 0.12, 0.08])
-    thal = np.random.choice([3.0, 6.0, 7.0], n_samples, p=[0.55, 0.05, 0.4])
+    male = np.random.binomial(1, 0.43, n_samples)
+    age = np.random.normal(49.5, 8.5, n_samples).clip(32, 70).round().astype(int)
+    education = np.random.choice([1, 2, 3, 4], n_samples, p=[0.41, 0.30, 0.17, 0.12])
+    currentSmoker = np.random.binomial(1, 0.49, n_samples)
+    cigsPerDay = np.where(currentSmoker == 1, np.random.exponential(18, n_samples).clip(1, 70).round(), 0)
+    BPMeds = np.random.choice([0, 1], n_samples, p=[0.96, 0.04])
+    prevalentStroke = np.random.binomial(1, 0.006, n_samples)
+    prevalentHyp = np.random.binomial(1, 0.31, n_samples)
+    diabetes = np.random.binomial(1, 0.026, n_samples)
+    totChol = np.random.normal(236.7, 44.3, n_samples).clip(107, 500).round()
+    sysBP = np.random.normal(132.3, 22.0, n_samples).clip(83.5, 250).round(1)
+    diaBP = np.random.normal(82.9, 11.9, n_samples).clip(48, 140).round(1)
+    BMI = np.random.normal(25.8, 4.0, n_samples).clip(15.5, 50.0).round(2)
+    heartRate = np.random.normal(75.8, 12.0, n_samples).clip(44, 140).round()
+    glucose = np.random.normal(81.9, 23.9, n_samples).clip(40, 350).round()
     
-    # Simple probability model for disease target
-    score = (
-        (age - 54) / 9.0 * 0.2 +
-        (sex - 0.5) * 0.3 +
-        (cp - 2.5) * 0.4 +
-        (trestbps - 130) / 17.0 * 0.2 +
-        (chol - 240) / 50.0 * 0.1 -
-        (thalach - 150) / 22.0 * 0.3 +
-        (exang - 0.3) * 0.4 +
-        (oldpeak - 1.0) * 0.5 +
-        (ca - 0.7) * 0.6 +
-        (thal - 4.5) * 0.5
+    z = (
+        (age - 50) * 0.06 +
+        male * 0.4 +
+        (currentSmoker * cigsPerDay / 20.0) * 0.3 +
+        (prevalentHyp * 0.5) +
+        (sysBP - 120) / 20.0 * 0.4 +
+        (totChol - 200) / 40.0 * 0.2 +
+        (diabetes * 0.8) +
+        (prevalentStroke * 1.0)
     )
-    median_score = np.median(score)
-    target = (score > median_score).astype(int)
+    prob = 1.0 / (1.0 + np.exp(- (z - 1.2)))
+    TenYearCHD = (np.random.rand(n_samples) < prob).astype(int)
     
     df = pd.DataFrame({
-        "age": age, "sex": sex, "cp": cp, "trestbps": trestbps, "chol": chol, "fbs": fbs,
-        "restecg": restecg, "thalach": thalach, "exang": exang, "oldpeak": oldpeak,
-        "slope": slope, "ca": ca, "thal": thal, "target": target
+        "male": male, "age": age, "education": education, "currentSmoker": currentSmoker,
+        "cigsPerDay": cigsPerDay, "BPMeds": BPMeds, "prevalentStroke": prevalentStroke,
+        "prevalentHyp": prevalentHyp, "diabetes": diabetes, "totChol": totChol,
+        "sysBP": sysBP, "diaBP": diaBP, "BMI": BMI, "heartRate": heartRate,
+        "glucose": glucose, "TenYearCHD": TenYearCHD
     })
     return df
 
 def run_optuna_tuning(X_train, y_train):
-    """Optional tuning of models if requested by user."""
+    """Optional tuning of models using Optuna."""
     if not OPTUNA_AVAILABLE:
         print("Optuna not available. Skipping tuning phase.")
         return get_default_tuned_params()
@@ -138,7 +126,6 @@ def run_optuna_tuning(X_train, y_train):
     
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
     
-    # 1. XGBoost Tuning if available
     best_xgb_params = {}
     if XGB_AVAILABLE:
         print("Tuning XGBoost...")
@@ -164,7 +151,6 @@ def run_optuna_tuning(X_train, y_train):
         best_xgb_params.update({"eval_metric": "logloss", "random_state": 42})
         print(f"Best XGBoost AUC: {xgb_study.best_value:.4f}")
     
-    # 2. Random Forest Tuning
     print("Tuning Random Forest...")
     def rf_objective(trial):
         params = {
@@ -187,23 +173,23 @@ def run_optuna_tuning(X_train, y_train):
     return best_xgb_params, best_rf_params
 
 def get_default_tuned_params():
-    """Default optimized hyperparameters."""
+    """Default optimized hyperparameters for Framingham Heart Study model."""
     xgb_params = {
-        "n_estimators": 312,
-        "max_depth": 7,
-        "learning_rate": 0.0195,
-        "subsample": 0.90,
-        "colsample_bytree": 0.74,
-        "reg_alpha": 0.23,
-        "reg_lambda": 0.0013,
-        "min_child_weight": 7,
+        "n_estimators": 300,
+        "max_depth": 6,
+        "learning_rate": 0.03,
+        "subsample": 0.85,
+        "colsample_bytree": 0.80,
+        "reg_alpha": 0.1,
+        "reg_lambda": 1.0,
+        "min_child_weight": 5,
         "eval_metric": "logloss",
         "random_state": 42
     }
     rf_params = {
         "n_estimators": 250,
-        "max_depth": 8,
-        "min_samples_split": 5,
+        "max_depth": 10,
+        "min_samples_split": 4,
         "min_samples_leaf": 2,
         "max_features": "sqrt",
         "random_state": 42
@@ -211,24 +197,19 @@ def get_default_tuned_params():
     return xgb_params, rf_params
 
 def build_stacking_classifier(xgb_params, rf_params):
-    """Creates a Stacking Classifier, falling back gracefully if estimators are missing."""
+    """Creates a Stacking Classifier with base learners and Logistic Regression meta-learner."""
     base_estimators = []
     
-    # Add XGBoost if available
     if XGB_AVAILABLE:
         base_estimators.append(("xgb", xgb.XGBClassifier(**xgb_params)))
     else:
-        # Fallback to Gradient Boosting
         base_estimators.append(("gb", GradientBoostingClassifier(n_estimators=150, max_depth=4, random_state=42)))
         
-    # Add Random Forest (always available)
     base_estimators.append(("rf", RandomForestClassifier(**rf_params)))
     
-    # Add LightGBM if available
     if LGBM_AVAILABLE:
-        base_estimators.append(("lgbm", lgb.LGBMClassifier(n_estimators=300, random_state=42, verbose=-1)))
+        base_estimators.append(("lgbm", lgb.LGBMClassifier(n_estimators=250, random_state=42, verbose=-1)))
     else:
-        # Fallback to Support Vector Classifier
         base_estimators.append(("svc", SVC(probability=True, C=1.0, kernel="rbf", random_state=42)))
         
     meta_learner = LogisticRegression(max_iter=1000, random_state=42)
@@ -245,16 +226,18 @@ def build_stacking_classifier(xgb_params, rf_params):
     return stacking_clf
 
 def train_model(tune_hyperparams=False):
-    # 1. Download & load data
-    df = download_dataset()
+    # 1. Load dataset
+    df = load_dataset()
+    print(f"Dataset loaded: {df.shape[0]} samples, {df.shape[1]} columns")
+    print(f"Target distribution:\n{df['TenYearCHD'].value_counts()}")
     
     # 2. Split train/test
-    train_df, test_df = train_test_split(df, test_size=0.2, random_state=42, stratify=df["target"])
+    train_df, test_df = train_test_split(df, test_size=0.2, random_state=42, stratify=df["TenYearCHD"])
     
-    X_train_raw = train_df.drop("target", axis=1)
-    y_train = train_df["target"]
-    X_test_raw = test_df.drop("target", axis=1)
-    y_test = test_df["target"]
+    X_train_raw = train_df.drop("TenYearCHD", axis=1)
+    y_train = train_df["TenYearCHD"]
+    X_test_raw = test_df.drop("TenYearCHD", axis=1)
+    y_test = test_df["TenYearCHD"]
     
     # 3. Fit Data Processor
     print("Fitting data processor and engineering features...")
@@ -267,7 +250,7 @@ def train_model(tune_hyperparams=False):
         print(f"Applying SMOTE... Original target counts: {np.bincount(y_train)}")
         sm = SMOTE(random_state=42)
         X_train_bal, y_train_bal = sm.fit_resample(X_train_processed, y_train)
-        print(f"Balanced target counts: {np.bincount(y_train_bal)}")
+        print(f"Balanced target counts after SMOTE: {np.bincount(y_train_bal)}")
     else:
         print("SMOTE unavailable. Proceeding with standard training set...")
         X_train_bal, y_train_bal = X_train_processed, y_train
@@ -291,7 +274,7 @@ def train_model(tune_hyperparams=False):
     f1 = f1_score(y_test, y_pred)
     
     print("\n" + "=" * 50)
-    print("MODEL EVALUATION METRICS (TEST SET)")
+    print("MODEL EVALUATION METRICS (TEST SET - FRAMINGHAM DATASET)")
     print("=" * 50)
     print(f"Accuracy:  {acc:.4f}")
     print(f"AUC-ROC:   {auc:.4f}")
@@ -314,6 +297,7 @@ def train_model(tune_hyperparams=False):
         },
         "metadata": {
             "training_date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "dataset": "Framingham Heart Study",
             "features_out": processor.feature_columns_,
             "xgb_params": xgb_params,
             "rf_params": rf_params
